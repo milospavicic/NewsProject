@@ -1,0 +1,2 @@
+# NewsProject
+Android news app.
