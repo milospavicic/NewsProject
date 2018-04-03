@@ -3,7 +3,9 @@ package com.example.korisnik.newsproject;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+
 
 public class PostActivity extends AppCompatActivity {
 
@@ -11,6 +13,17 @@ public class PostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+
+        Toolbar toolbar = findViewById(R.id.toolbarPostA);
+        setSupportActionBar(toolbar);
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setIcon(R.drawable.ic_launcher_background);
+            //actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
+            actionBar.setHomeButtonEnabled(true);
+        }
     }
     public void btnCreatePostActivity(View view) {
         Intent i = new Intent(this,CreatePostActivity.class);
