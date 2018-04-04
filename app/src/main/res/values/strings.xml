@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">News</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="home">Home</string>
+    <string name="all_post">All posts</string>
+    <string name="preferances">Preferences</string>
+    <string name="preferance_long">Change your Preferences</string>
 </resources>
