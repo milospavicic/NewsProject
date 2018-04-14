@@ -1,5 +1,6 @@
 package com.example.korisnik.newsproject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
 import com.example.korisnik.newsproject.model.NavItem;
@@ -88,6 +90,14 @@ public class PostActivity extends AppCompatActivity {
     public void btnSettingsActivity(View view) {
         Intent i = new Intent(this,SettingsActivity.class);
         startActivity(i);
+    }
+    public void refreshButton(View view){
+        Context context = getApplicationContext();
+        CharSequence text = "Refresh";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     private void prepareMenu(ArrayList<NavItem> mNavItems ){
