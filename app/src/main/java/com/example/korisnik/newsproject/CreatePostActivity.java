@@ -81,6 +81,16 @@ public class CreatePostActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }else{
+            int id = item.getItemId();
+            if(id == R.id.action_settings){
+                Intent i = new Intent(this,SettingsActivity.class);
+                startActivity(i);
+            }
+            if(id == R.id.action_new){
+                Intent i = new Intent(this,CreatePostActivity.class);
+                startActivity(i);
+            }
         }
 
         return super.onOptionsItemSelected(item);

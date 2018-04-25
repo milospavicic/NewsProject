@@ -1,6 +1,5 @@
 package com.example.korisnik.newsproject;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,12 +12,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
+import com.example.korisnik.newsproject.adapters.PostAdapter;
 import com.example.korisnik.newsproject.model.NavItem;
+import com.example.korisnik.newsproject.model.Post;
+import com.example.korisnik.newsproject.model.User;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class PostActivity extends AppCompatActivity {
@@ -29,6 +33,9 @@ public class PostActivity extends AppCompatActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+    private ArrayList<Post> posts = new ArrayList<>();
+
+    private Post post = new Post();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +45,6 @@ public class PostActivity extends AppCompatActivity {
         prepareMenu(mNavItems);
 
         mTitle = mDrawerTitle = getTitle();
-
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerList = findViewById(R.id.nav_list);
 
@@ -76,28 +82,37 @@ public class PostActivity extends AppCompatActivity {
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
+        User newUser = new User();
+        newUser.setName("NewUserName");
 
+        Date currentTime = Calendar.getInstance().getTime();
 
-    }
-    public void btnCreatePostActivity(View view) {
-        Intent i = new Intent(this,CreatePostActivity.class);
-        startActivity(i);
+        post.setAuthor(newUser);
+        post.setTitle("Post Title");
+        post.setDate(currentTime);
+        posts.add(post);
+        posts.add(post);
+        posts.add(post);
+        posts.add(post);
+
+        PostAdapter postListAdapter = new PostAdapter(this,posts);
+        ListView listView = findViewById(R.id.post_list_view);
+
+        //postListAdapter.add(post);
+        listView.setAdapter(postListAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(PostActivity.this,ReadPostActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
     public void btnReadPostActivity(View view) {
         Intent i = new Intent(this,ReadPostActivity.class);
         startActivity(i);
-    }
-    public void btnSettingsActivity(View view) {
-        Intent i = new Intent(this,SettingsActivity.class);
-        startActivity(i);
-    }
-    public void refreshButton(View view){
-        Context context = getApplicationContext();
-        CharSequence text = "Refresh";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
     }
 
     private void prepareMenu(ArrayList<NavItem> mNavItems ){
@@ -109,10 +124,21 @@ public class PostActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }else{
+            int id = item.getItemId();
+            if(id == R.id.action_settings){
+                Intent i = new Intent(this,SettingsActivity.class);
+                startActivity(i);
+            }
+            if(id == R.id.action_new){
+                Intent i = new Intent(this,CreatePostActivity.class);
+                startActivity(i);
+            }
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override

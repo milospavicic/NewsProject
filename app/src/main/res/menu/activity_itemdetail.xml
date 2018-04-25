@@ -4,21 +4,12 @@
     <item android:id="@+id/action_settings"
         android:title="Settings"
         android:orderInCategory="100"
-        app:showAsAction="never"
-        android:onClick="btnSettingsActivity"/>
-
-    <item android:id="@+id/action_refresh"
-        android:title="Refresh"
-        android:icon="@drawable/ic_refresh_black"
-        android:orderInCategory="200"
-        android:onClick="refreshButton"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never"/>
 
     <item android:id="@+id/action_new"
         android:title="New"
         android:icon="@drawable/ic_add_black"
-        android:orderInCategory="300"
-        android:onClick="btnCreatePostActivity"
+        android:orderInCategory="200"
         app:showAsAction="ifRoom" />
 
 </menu>

@@ -13,19 +13,26 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.example.korisnik.newsproject.adapters.CommentAdapter;
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
+import com.example.korisnik.newsproject.model.Comment;
 import com.example.korisnik.newsproject.model.NavItem;
+import com.example.korisnik.newsproject.model.Post;
+import com.example.korisnik.newsproject.model.User;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ReadPostActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+    private ListView mCommentList;
     private ActionBarDrawerToggle mDrawerToggle;
     private RelativeLayout mDrawerPane;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+    private ArrayList<Comment> mComments = new ArrayList<Comment>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,11 @@ public class ReadPostActivity extends AppCompatActivity {
         DrawerListAdapter adapter = new DrawerListAdapter(this, mNavItems);
         mDrawerList.setOnItemClickListener(new ReadPostActivity.DrawerItemClickListener());
         mDrawerList.setAdapter(adapter);
+
+//        loadComments(mComments);
+//        CommentAdapter adapter1 = new CommentAdapter(this,mComments);
+//        mCommentList = findViewById(R.id.comment_list);
+//        mCommentList.setAdapter(adapter1);
 
         Toolbar toolbar = findViewById(R.id.toolbarPostA);
         setSupportActionBar(toolbar);
@@ -82,6 +94,16 @@ public class ReadPostActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }else{
+            int id = item.getItemId();
+            if(id == R.id.action_settings){
+                Intent i = new Intent(this,SettingsActivity.class);
+                startActivity(i);
+            }
+            if(id == R.id.action_new){
+                Intent i = new Intent(this,CreatePostActivity.class);
+                startActivity(i);
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -99,9 +121,10 @@ public class ReadPostActivity extends AppCompatActivity {
             Intent homeIntent = new Intent(this, PostActivity.class);
             startActivity(homeIntent);
         }else if(position == 1){
-            Intent preferanceIntent = new Intent(this,SettingsActivity.class);
-            startActivity(preferanceIntent);
+            Intent preferenceIntent = new Intent(this,SettingsActivity.class);
+            startActivity(preferenceIntent);
         }
+
 
         mDrawerList.setItemChecked(position, true);
         setTitle(mNavItems.get(position).getmTitle());
@@ -116,5 +139,12 @@ public class ReadPostActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.activity_itemdetail, menu);
         return true;
+    }
+    public void loadComments(ArrayList<Comment> coments){
+        User tempUser = new User(1,"name",null,"username","password",new ArrayList<Post>(),new ArrayList<Comment>());
+        Post tempPost = new Post(1,"title","desc",null,tempUser,null,null,null,null,1,1);
+        mComments.add(new Comment(1,"title1","text1",tempUser,null,tempPost,1,1));
+        mComments.add(new Comment(1,"title2","text2",tempUser,null,tempPost,1,1));
+        mComments.add(new Comment(1,"title3","text3",tempUser,null,tempPost,1,1));
     }
 }

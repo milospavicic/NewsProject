@@ -1,140 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.korisnik.newsproject.ReadPostActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark" />
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbarPostA"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:layout_scrollFlags="scroll|enterAlways">
+
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context="com.example.korisnik.newsproject.ReadPostActivity">
+        android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbar"
+        <TextView
+            android:id="@+id/read_post_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:text="Temp title"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorPrimaryDark" />
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbarPostA"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                app:layout_scrollFlags="scroll|enterAlways">
-
-            </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.AppBarLayout>
-
-
-        <android.support.v4.widget.DrawerLayout
-            android:id="@+id/drawer_layout"
+        <ImageView
+            android:id="@+id/read_post_picture"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-        <LinearLayout
+            android:layout_height="270dp"/>
+
+        <TextView
+            android:id="@+id/read_post_text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."/>
+        <TextView
+            android:id="@+id/read_post_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tags:"/>
+        <TextView
+            android:id="@+id/read_post_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Author"/>
+        <TextView
+            android:id="@+id/read_post_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date posted"/>
 
-            <TextView
-                android:id="@+id/read_post_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Temp title"/>
-
-            <ImageView
-                android:id="@+id/read_post_picture"
-                android:layout_width="match_parent"
-                android:layout_height="270dp"/>
-
-            <TextView
-                android:id="@+id/read_post_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."/>
-            <TextView
-                android:id="@+id/read_post_tags"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tags:"/>
-            <TextView
-                android:id="@+id/read_post_author"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Author"/>
-            <TextView
-                android:id="@+id/read_post_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Date posted"/>
-
-            <ListView
-                android:id="@+id/comment_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </ListView>
-
-        </LinearLayout>
-        <RelativeLayout
-            android:id="@+id/drawer_pane"
-            android:layout_width="280dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start">
-
-            <RelativeLayout
-                android:id="@+id/profile_box"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@color/colorAccent"
-                android:padding="8dp">
-
-                <ImageView
-                    android:id="@+id/drawer_user_avatar"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/ic_refresh_black"
-                    android:layout_marginTop="15dp"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="42dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="15dp"
-                    android:layout_toRightOf="@id/avatar"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/drawer_user_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TempName"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#fff"/>
-
-                </LinearLayout>
-
-            </RelativeLayout>
-
-            <ListView
-                android:id="@+id/nav_list"
-                android:layout_width="280dp"
-                android:layout_height="match_parent"
-                android:layout_below="@id/profile_box"
-                android:choiceMode="singleChoice"
-                android:background="#fff"/>
-
-        </RelativeLayout>
-        </android.support.v4.widget.DrawerLayout>
+        <ListView
+            android:id="@+id/comment_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
 
     </LinearLayout>
-</ScrollView>
+    <RelativeLayout
+        android:id="@+id/drawer_pane"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start">
+
+        <RelativeLayout
+            android:id="@+id/profile_box"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/white"
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/drawer_user_avatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_person_black_24dp"
+                android:layout_marginTop="15dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="15dp"
+                android:layout_toRightOf="@id/drawer_user_avatar"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/drawer_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TempName"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/nav_list"
+            android:layout_width="280dp"
+            android:layout_height="match_parent"
+            android:layout_below="@id/profile_box"
+            android:choiceMode="singleChoice"
+            android:background="#fff"/>
+
+    </RelativeLayout>
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>

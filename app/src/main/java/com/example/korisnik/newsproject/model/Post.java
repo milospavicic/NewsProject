@@ -19,6 +19,9 @@ public class Post {
     private int likes;
     private int dislikes;
 
+    public Post() {
+    }
+
     public Post(int id, String title, String description, Bitmap photo, User author, Date date,
                 Location location, List<Tag> tags, List<Comment> comments, int likes, int dislikes) {
         this.id = id;

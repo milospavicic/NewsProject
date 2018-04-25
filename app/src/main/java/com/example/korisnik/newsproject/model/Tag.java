@@ -7,6 +7,9 @@ public class Tag {
     private String name;
     private List<Post> posts;
 
+    public Tag() {
+    }
+
     public Tag(int id, String name, List<Post> posts) {
         this.id = id;
         this.name = name;
