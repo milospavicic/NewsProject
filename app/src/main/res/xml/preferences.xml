@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:checked="true"
-        android:summary="First option" />
+    <PreferenceCategory
+        android:title="General Settings"
+        android:key="general_settings">
+
+        <ListPreference
+            android:key="post_sort"
+            android:title="Sort posts by"
+            android:dialogTitle="Sort posts by"
+            android:entries="@array/sort_post_by"
+            android:entryValues="@array/sort_post_alias"
+            android:defaultValue="Date"
+            android:summary="%s"/>
+        <ListPreference
+            android:key="comment_sort"
+            android:title="Sort comments by"
+            android:dialogTitle="Sort comments by"
+            android:entries="@array/sort_comment_by"
+            android:entryValues="@array/sort_comment_alias"
+            android:defaultValue="Date"
+            android:summary="%s"/>
+    </PreferenceCategory>
 </PreferenceScreen>

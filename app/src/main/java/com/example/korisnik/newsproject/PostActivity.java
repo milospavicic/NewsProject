@@ -1,11 +1,15 @@
 package com.example.korisnik.newsproject;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +58,7 @@ public class PostActivity extends AppCompatActivity {
         mDrawerList.setAdapter(adapter);
 
 
+
         Toolbar toolbar = findViewById(R.id.toolbarPostA);
         setSupportActionBar(toolbar);
         final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -82,18 +87,17 @@ public class PostActivity extends AppCompatActivity {
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-        User newUser = new User();
-        newUser.setName("NewUserName");
 
-        Date currentTime = Calendar.getInstance().getTime();
+        initPosts();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String post_sort = preferences.getString("post_sort", null);
+        if(post_sort.equals("0")){
+            //posts.sort((o1,o2) -> o1.getDate().compareTo(o2.getDate()));
+            //sort posts by date
+        }else{
+            //sort posts by popularity
+        }
 
-        post.setAuthor(newUser);
-        post.setTitle("Post Title");
-        post.setDate(currentTime);
-        posts.add(post);
-        posts.add(post);
-        posts.add(post);
-        posts.add(post);
 
         PostAdapter postListAdapter = new PostAdapter(this,posts);
         ListView listView = findViewById(R.id.post_list_view);
@@ -202,5 +206,28 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
+    }
+
+    public void initPosts(){
+        User newUser = new User();
+        newUser.setName("NewUserName");
+
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.set(Calendar.YEAR,2018);
+        currentTime.set(Calendar.MONTH,1);
+        currentTime.set(Calendar.DAY_OF_MONTH,5);
+        currentTime.set(Calendar.HOUR_OF_DAY, 1);
+        currentTime.set(Calendar.MINUTE, 0);
+        currentTime.set(Calendar.SECOND, 0);
+        currentTime.set(Calendar.MILLISECOND, 0);
+
+        for(int i =0; i<=10; i++){
+            Post newPost = new Post();
+            newPost.setAuthor(newUser);
+            newPost.setTitle("Post Title "+i);
+            currentTime.set(Calendar.MINUTE, i*5);
+            newPost.setDate(currentTime.getTime());
+            posts.add(newPost);
+        }
     }
 }
