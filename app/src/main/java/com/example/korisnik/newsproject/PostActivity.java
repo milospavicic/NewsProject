@@ -26,7 +26,9 @@ import com.example.korisnik.newsproject.model.User;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 
 public class PostActivity extends AppCompatActivity {
@@ -89,14 +91,7 @@ public class PostActivity extends AppCompatActivity {
 
 
         initPosts();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String post_sort = preferences.getString("post_sort", null);
-        if(post_sort.equals("0")){
-            //posts.sort((o1,o2) -> o1.getDate().compareTo(o2.getDate()));
-            //sort posts by date
-        }else{
-            //sort posts by popularity
-        }
+
 
 
         PostAdapter postListAdapter = new PostAdapter(this,posts);
@@ -229,5 +224,15 @@ public class PostActivity extends AppCompatActivity {
             newPost.setDate(currentTime.getTime());
             posts.add(newPost);
         }
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String post_sort = preferences.getString("post_sort", null);
+        if(post_sort.equals("0")){
+            posts.sort((o1,o2) -> o1.getDate().compareTo(o2.getDate()));
+            //sort posts by date
+        }else{
+            //sort posts by popularity
+        }
+
     }
 }

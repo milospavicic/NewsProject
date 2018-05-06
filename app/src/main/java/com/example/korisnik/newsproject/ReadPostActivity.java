@@ -21,6 +21,7 @@ import com.example.korisnik.newsproject.model.Post;
 import com.example.korisnik.newsproject.model.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class ReadPostActivity extends AppCompatActivity {
@@ -51,10 +52,10 @@ public class ReadPostActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new ReadPostActivity.DrawerItemClickListener());
         mDrawerList.setAdapter(adapter);
 
-//        loadComments(mComments);
-//        CommentAdapter adapter1 = new CommentAdapter(this,mComments);
-//        mCommentList = findViewById(R.id.comment_list);
-//        mCommentList.setAdapter(adapter1);
+        loadComments();
+        CommentAdapter adapter1 = new CommentAdapter(this,mComments);
+        mCommentList = findViewById(R.id.comment_list);
+        mCommentList.setAdapter(adapter1);
 
         Toolbar toolbar = findViewById(R.id.toolbarPostA);
         setSupportActionBar(toolbar);
@@ -140,11 +141,21 @@ public class ReadPostActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.activity_itemdetail, menu);
         return true;
     }
-    public void loadComments(ArrayList<Comment> coments){
+    public void loadComments(){
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.set(Calendar.YEAR,2018);
+        currentTime.set(Calendar.MONTH,1);
+        currentTime.set(Calendar.DAY_OF_MONTH,5);
+        currentTime.set(Calendar.HOUR_OF_DAY, 1);
+        currentTime.set(Calendar.MINUTE, 0);
+        currentTime.set(Calendar.SECOND, 0);
+        currentTime.set(Calendar.MILLISECOND, 0);
+
+
         User tempUser = new User(1,"name",null,"username","password",new ArrayList<Post>(),new ArrayList<Comment>());
         Post tempPost = new Post(1,"title","desc",null,tempUser,null,null,null,null,1,1);
-        mComments.add(new Comment(1,"title1","text1",tempUser,null,tempPost,1,1));
-        mComments.add(new Comment(1,"title2","text2",tempUser,null,tempPost,1,1));
-        mComments.add(new Comment(1,"title3","text3",tempUser,null,tempPost,1,1));
+        mComments.add(new Comment(1,"title1","text1",tempUser,currentTime.getTime(),tempPost,1,1));
+        mComments.add(new Comment(1,"title2","text2",tempUser,currentTime.getTime(),tempPost,1,1));
+        mComments.add(new Comment(1,"title3","text3",tempUser,currentTime.getTime(),tempPost,1,1));
     }
 }
