@@ -33,7 +33,7 @@
         <activity
             android:name=".SettingsActivity"
             android:label="Settings"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"/> //skinuti?
     </application>
 
 </manifest>

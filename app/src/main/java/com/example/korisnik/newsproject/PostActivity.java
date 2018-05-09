@@ -27,8 +27,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 
 public class PostActivity extends AppCompatActivity {
@@ -40,8 +42,7 @@ public class PostActivity extends AppCompatActivity {
     private CharSequence mTitle;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
     private ArrayList<Post> posts = new ArrayList<>();
-
-    private Post post = new Post();
+    private PostAdapter postAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,13 +93,14 @@ public class PostActivity extends AppCompatActivity {
 
         initPosts();
 
+        postAdapter = new PostAdapter(this,posts);
 
+        sortPosts();
 
-        PostAdapter postListAdapter = new PostAdapter(this,posts);
         ListView listView = findViewById(R.id.post_list_view);
 
         //postListAdapter.add(post);
-        listView.setAdapter(postListAdapter);
+        listView.setAdapter(postAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -196,6 +198,7 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        sortPosts();
     }
 
     @Override
@@ -212,7 +215,7 @@ public class PostActivity extends AppCompatActivity {
         currentTime.set(Calendar.MONTH,1);
         currentTime.set(Calendar.DAY_OF_MONTH,5);
         currentTime.set(Calendar.HOUR_OF_DAY, 1);
-        currentTime.set(Calendar.MINUTE, 0);
+        currentTime.set(Calendar.MINUTE, 60);
         currentTime.set(Calendar.SECOND, 0);
         currentTime.set(Calendar.MILLISECOND, 0);
 
@@ -220,19 +223,60 @@ public class PostActivity extends AppCompatActivity {
             Post newPost = new Post();
             newPost.setAuthor(newUser);
             newPost.setTitle("Post Title "+i);
-            currentTime.set(Calendar.MINUTE, i*5);
+
+            Random r = new Random();
+            int randomMinute = r.nextInt(60 - 1) + 1;
+            int randomLikes = r.nextInt(100-1)+1;
+            int randomDislikes = r.nextInt(100-1)+1;
+
+            currentTime.set(Calendar.MINUTE, randomMinute);
             newPost.setDate(currentTime.getTime());
+            newPost.setLikes(randomLikes);
+            newPost.setDislikes(randomDislikes);
             posts.add(newPost);
         }
+    }
+    public void sortPosts(){
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String post_sort = preferences.getString("post_sort", null);
-        if(post_sort.equals("0")){
-            posts.sort((o1,o2) -> o1.getDate().compareTo(o2.getDate()));
-            //sort posts by date
-        }else{
-            //sort posts by popularity
+        Log.e("myTag",post_sort);
+        if(post_sort!=null){
+            if(post_sort.equals("0")){
+                Log.e("myTag","error1");
+                sortDate();
+            }else{
+                Log.e("myTag","error2");
+                sortByPopularity();
+            }
         }
+    }
+    public void sortDate(){
+        Collections.sort(posts, new Comparator<Post>() {
+            @Override
+            public int compare(Post post, Post t1) {
+                return t1.getDate().compareTo(post.getDate());
+            }
+        });
 
+
+        postAdapter.notifyDataSetChanged();
+    }
+
+    public void sortByPopularity(){
+
+        Collections.sort(posts, new Comparator<Post>() {
+            @Override
+            public int compare(Post post, Post t1) {
+                int first;
+                int second ;
+                first = post.getLikes() - post.getDislikes();
+                second = t1.getLikes() - t1.getDislikes();
+                return Integer.valueOf(second).compareTo(first);
+            }
+        });
+
+
+        postAdapter.notifyDataSetChanged();
     }
 }

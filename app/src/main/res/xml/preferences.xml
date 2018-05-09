@@ -10,7 +10,7 @@
             android:dialogTitle="Sort posts by"
             android:entries="@array/sort_post_by"
             android:entryValues="@array/sort_post_alias"
-            android:defaultValue="Date"
+            android:defaultValue="0"
             android:summary="%s"/>
         <ListPreference
             android:key="comment_sort"
@@ -18,7 +18,7 @@
             android:dialogTitle="Sort comments by"
             android:entries="@array/sort_comment_by"
             android:entryValues="@array/sort_comment_alias"
-            android:defaultValue="Date"
+            android:defaultValue="0"
             android:summary="%s"/>
     </PreferenceCategory>
 </PreferenceScreen>
