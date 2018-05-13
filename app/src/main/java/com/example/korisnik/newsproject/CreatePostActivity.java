@@ -1,6 +1,7 @@
 package com.example.korisnik.newsproject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
 import com.example.korisnik.newsproject.model.NavItem;
@@ -75,7 +77,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private void prepareMenu(ArrayList<NavItem> mNavItems ){
         mNavItems.add(new NavItem(getString(R.string.home), getString(R.string.all_post), R.drawable.ic_home_black));
         mNavItems.add(new NavItem(getString(R.string.preferances), getString(R.string.preferance_long), R.drawable.ic_settings_black));
-
+        mNavItems.add(new NavItem("Logout", "", R.drawable.ic_exit_to_app_black_24dp));
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -110,6 +112,13 @@ public class CreatePostActivity extends AppCompatActivity {
         }else if(position == 1){
             Intent preferanceIntent = new Intent(this,SettingsActivity.class);
             startActivity(preferanceIntent);
+        }else if(position ==2){
+            SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.remove("userId");
+            Intent logoutIntent = new Intent(this,LoginActivity.class);
+            startActivity(logoutIntent);
+            finish();
         }
 
         mDrawerList.setItemChecked(position, true);

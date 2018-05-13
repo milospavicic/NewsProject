@@ -38,9 +38,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <ScrollView
+            android:id="@+id/read_post_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <LinearLayout
@@ -63,7 +65,7 @@
                     android:id="@+id/read_post_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
+                    android:layout_marginBottom="5dp"
                     android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."/>
                 <TextView
                     android:id="@+id/read_post_tags"
@@ -80,15 +82,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Date posted"/>
-
-
-                <ListView
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <Button
+                        android:id="@+id/like_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Like"/>
+                    <Button
+                        android:id="@+id/dislike_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/like_button"
+                        android:text="Dislike"/>
+                </RelativeLayout>
+                <com.example.korisnik.newsproject.tools.NonScrollListView
                     android:id="@+id/comment_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:choiceMode="singleChoice"
                     android:padding="5dp">
 
-                </ListView>
+                </com.example.korisnik.newsproject.tools.NonScrollListView>
             </LinearLayout>
         </ScrollView>
 

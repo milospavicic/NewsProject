@@ -3,6 +3,7 @@ package com.example.korisnik.newsproject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,13 +17,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
 import com.example.korisnik.newsproject.adapters.PostAdapter;
+import com.example.korisnik.newsproject.database.DatabaseHelper;
+import com.example.korisnik.newsproject.database.PostDAO;
 import com.example.korisnik.newsproject.model.NavItem;
 import com.example.korisnik.newsproject.model.Post;
 import com.example.korisnik.newsproject.model.User;
+import com.example.korisnik.newsproject.tools.Util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,11 +49,17 @@ public class PostActivity extends AppCompatActivity {
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
     private ArrayList<Post> posts = new ArrayList<>();
     private PostAdapter postAdapter;
+    DatabaseHelper mDatabaseHelper ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+//        mDatabaseHelper = new DatabaseHelper(this);
+//        mDatabaseHelper.dropTables();
+//        Util.initDB(this);
+        posts = PostDAO.getPostsFromDB(this);
 
         prepareMenu(mNavItems);
 
@@ -90,22 +102,17 @@ public class PostActivity extends AppCompatActivity {
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-
-        initPosts();
-
         postAdapter = new PostAdapter(this,posts);
-
         sortPosts();
-
         ListView listView = findViewById(R.id.post_list_view);
-
-        //postListAdapter.add(post);
         listView.setAdapter(postAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(PostActivity.this,ReadPostActivity.class);
+                Post post = posts.get(i);
+                intent.putExtra("ID",post.getId());
                 startActivity(intent);
             }
         });
@@ -119,6 +126,7 @@ public class PostActivity extends AppCompatActivity {
     private void prepareMenu(ArrayList<NavItem> mNavItems ){
         mNavItems.add(new NavItem(getString(R.string.home), getString(R.string.all_post), R.drawable.ic_home_black));
         mNavItems.add(new NavItem(getString(R.string.preferances), getString(R.string.preferance_long), R.drawable.ic_settings_black));
+        mNavItems.add(new NavItem("Logout", "", R.drawable.ic_exit_to_app_black_24dp));
 
     }
     @Override
@@ -155,6 +163,13 @@ public class PostActivity extends AppCompatActivity {
         }else if(position == 1){
             Intent preferanceIntent = new Intent(this,SettingsActivity.class);
             startActivity(preferanceIntent);
+        }else if(position ==2){
+            SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.remove("userId");
+            Intent logoutIntent = new Intent(this,LoginActivity.class);
+            startActivity(logoutIntent);
+            finish();
         }
 
         mDrawerList.setItemChecked(position, true);
@@ -206,47 +221,16 @@ public class PostActivity extends AppCompatActivity {
         super.onRestart();
     }
 
-    public void initPosts(){
-        User newUser = new User();
-        newUser.setName("NewUserName");
-
-        Calendar currentTime = Calendar.getInstance();
-        currentTime.set(Calendar.YEAR,2018);
-        currentTime.set(Calendar.MONTH,1);
-        currentTime.set(Calendar.DAY_OF_MONTH,5);
-        currentTime.set(Calendar.HOUR_OF_DAY, 1);
-        currentTime.set(Calendar.MINUTE, 60);
-        currentTime.set(Calendar.SECOND, 0);
-        currentTime.set(Calendar.MILLISECOND, 0);
-
-        for(int i =0; i<=10; i++){
-            Post newPost = new Post();
-            newPost.setAuthor(newUser);
-            newPost.setTitle("Post Title "+i);
-
-            Random r = new Random();
-            int randomMinute = r.nextInt(60 - 1) + 1;
-            int randomLikes = r.nextInt(100-1)+1;
-            int randomDislikes = r.nextInt(100-1)+1;
-
-            currentTime.set(Calendar.MINUTE, randomMinute);
-            newPost.setDate(currentTime.getTime());
-            newPost.setLikes(randomLikes);
-            newPost.setDislikes(randomDislikes);
-            posts.add(newPost);
-        }
-    }
     public void sortPosts(){
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String post_sort = preferences.getString("post_sort", null);
-        Log.e("myTag",post_sort);
         if(post_sort!=null){
             if(post_sort.equals("0")){
-                Log.e("myTag","error1");
+                Log.e("myTag","Sort posts by date");
                 sortDate();
             }else{
-                Log.e("myTag","error2");
+                Log.e("myTag","Sort posts by popularity");
                 sortByPopularity();
             }
         }

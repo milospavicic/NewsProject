@@ -1,25 +1,36 @@
 package com.example.korisnik.newsproject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.korisnik.newsproject.adapters.CommentAdapter;
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
+import com.example.korisnik.newsproject.database.CommentsDAO;
+import com.example.korisnik.newsproject.database.PostDAO;
 import com.example.korisnik.newsproject.model.Comment;
 import com.example.korisnik.newsproject.model.NavItem;
 import com.example.korisnik.newsproject.model.Post;
+import com.example.korisnik.newsproject.model.Tag;
 import com.example.korisnik.newsproject.model.User;
 
+import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,11 +45,23 @@ public class ReadPostActivity extends AppCompatActivity {
     private CharSequence mTitle;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
     private ArrayList<Comment> mComments = new ArrayList<Comment>();
+    private Post currentPost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_post);
+        Intent intent = getIntent();
+        Integer postID = intent.getIntExtra("ID",11);
+        currentPost = PostDAO.getPostById(postID,this);
+        ScrollView scrollView = (ScrollView) findViewById(R.id.read_post_scroll_view);
+        scrollView.setFocusableInTouchMode(true);
+        scrollView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+
+
+        loadPage();
+
+
 
         prepareMenu(mNavItems);
 
@@ -52,7 +75,11 @@ public class ReadPostActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new ReadPostActivity.DrawerItemClickListener());
         mDrawerList.setAdapter(adapter);
 
-        loadComments();
+        //loadComments();
+        mComments = CommentsDAO.getCommentsForPostId(postID,this);
+        Log.e("commentCount",mComments.size()+""); //IMA 3 ..
+
+
         CommentAdapter adapter1 = new CommentAdapter(this,mComments);
         mCommentList = findViewById(R.id.comment_list);
         mCommentList.setAdapter(adapter1);
@@ -86,9 +113,11 @@ public class ReadPostActivity extends AppCompatActivity {
         mDrawerToggle.syncState();
 
     }
+
     private void prepareMenu(ArrayList<NavItem> mNavItems ){
         mNavItems.add(new NavItem(getString(R.string.home), getString(R.string.all_post), R.drawable.ic_home_black));
         mNavItems.add(new NavItem(getString(R.string.preferances), getString(R.string.preferance_long), R.drawable.ic_settings_black));
+        mNavItems.add(new NavItem("Logout", "", R.drawable.ic_exit_to_app_black_24dp));
 
     }
     @Override
@@ -124,8 +153,14 @@ public class ReadPostActivity extends AppCompatActivity {
         }else if(position == 1){
             Intent preferenceIntent = new Intent(this,SettingsActivity.class);
             startActivity(preferenceIntent);
+        }else if(position ==2){
+            SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.remove("userId");
+            Intent logoutIntent = new Intent(this,LoginActivity.class);
+            startActivity(logoutIntent);
+            finish();
         }
-
 
         mDrawerList.setItemChecked(position, true);
         setTitle(mNavItems.get(position).getmTitle());
@@ -158,4 +193,30 @@ public class ReadPostActivity extends AppCompatActivity {
         mComments.add(new Comment(1,"title2","text2",tempUser,currentTime.getTime(),tempPost,1,1));
         mComments.add(new Comment(1,"title3","text3",tempUser,currentTime.getTime(),tempPost,1,1));
     }
+
+    private void loadPage() {
+        TextView title = findViewById(R.id.read_post_title);
+        TextView desc = findViewById(R.id.read_post_text);
+        TextView author = findViewById(R.id.read_post_author);
+        TextView datePosted = findViewById(R.id.read_post_date);
+        TextView tags = findViewById(R.id.read_post_tags);
+        String newDate = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(currentPost.getDate());
+
+
+        title.setText(currentPost.getTitle());
+        desc.setText(currentPost.getDescription());
+        author.setText("Author: "+currentPost.getAuthor().getName());
+        datePosted.setText("Posted: "+newDate);
+        String allTags = "Tags: ";
+        Integer i = 1;
+        Integer count = currentPost.getTags().size();
+        for (Tag tag:currentPost.getTags()) {
+            allTags+=tag.getName();
+            i++;
+            if(i<=count)
+                allTags+=", ";
+        }
+        tags.setText(allTags);
+    }
+
 }

@@ -13,11 +13,11 @@ public class Post {
     private Bitmap photo;
     private User author;
     private Date date;
+    private int likes;
+    private int dislikes;
     private Location location;
     private List<Tag> tags;
     private List<Comment> comments;
-    private int likes;
-    private int dislikes;
 
     public Post() {
     }

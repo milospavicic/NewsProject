@@ -47,6 +47,18 @@
         android:layout_centerHorizontal="true"
         android:padding="2dp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
-
+    <Button
+        android:id="@+id/comment_like_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment_text"
+        android:text="Like"/>
+    <Button
+        android:id="@+id/comment_dislike_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment_text"
+        android:layout_toEndOf="@id/comment_like_button"
+        android:text="Dislike"/>
 
 </RelativeLayout>
