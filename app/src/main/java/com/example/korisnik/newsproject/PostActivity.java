@@ -3,12 +3,11 @@ package com.example.korisnik.newsproject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -17,27 +16,24 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
 import com.example.korisnik.newsproject.adapters.PostAdapter;
-import com.example.korisnik.newsproject.database.DatabaseHelper;
-import com.example.korisnik.newsproject.database.PostDAO;
 import com.example.korisnik.newsproject.model.NavItem;
 import com.example.korisnik.newsproject.model.Post;
-import com.example.korisnik.newsproject.model.User;
-import com.example.korisnik.newsproject.tools.Util;
+import com.example.korisnik.newsproject.service.PostService;
+import com.example.korisnik.newsproject.service.ServiceUtils;
+import com.google.gson.Gson;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PostActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
@@ -47,19 +43,23 @@ public class PostActivity extends AppCompatActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
-    private ArrayList<Post> posts = new ArrayList<>();
-    private PostAdapter postAdapter;
-    DatabaseHelper mDatabaseHelper ;
-
+    private static List<Post> posts = new ArrayList<>();
+    private static PostAdapter postAdapter;
+    private static ListView listView;
+    private PostService postService;
+    private static Context mContext;
+    private Post postEdited;
+    private int postEditedPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        mContext = this;
 //        mDatabaseHelper = new DatabaseHelper(this);
 //        mDatabaseHelper.dropTables();
 //        Util.initDB(this);
-        posts = PostDAO.getPostsFromDB(this);
+//        posts = PostDAO.getPostsFromDB(this);
 
         prepareMenu(mNavItems);
 
@@ -102,25 +102,23 @@ public class PostActivity extends AppCompatActivity {
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-        postAdapter = new PostAdapter(this,posts);
-        sortPosts();
-        ListView listView = findViewById(R.id.post_list_view);
-        listView.setAdapter(postAdapter);
+        listView = findViewById(R.id.post_list_view);
+        postService = ServiceUtils.postService;
+        loadPosts();
+
+
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(PostActivity.this,ReadPostActivity.class);
-                Post post = posts.get(i);
-                intent.putExtra("ID",post.getId());
-                startActivity(intent);
+                postEdited=posts.get(i);
+                postEditedPosition=i;
+                Intent intent=new Intent(PostActivity.this,ReadPostActivity.class);
+                intent.putExtra("Post",new Gson().toJson(postEdited));
+                startActivityForResult(intent,0);
             }
         });
 
-    }
-    public void btnReadPostActivity(View view) {
-        Intent i = new Intent(this,ReadPostActivity.class);
-        startActivity(i);
     }
 
     private void prepareMenu(ArrayList<NavItem> mNavItems ){
@@ -213,7 +211,11 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        sortPosts();
+        loadPosts();
+
+        if(postAdapter!=null)
+            sortPosts();
+
     }
 
     @Override
@@ -262,5 +264,23 @@ public class PostActivity extends AppCompatActivity {
 
 
         postAdapter.notifyDataSetChanged();
+    }
+
+    public void loadPosts(){
+        Call call = postService.getPosts();
+        call.enqueue(new Callback<List<Post>>() {
+            @Override
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+                posts = response.body();
+                postAdapter = new PostAdapter(mContext,posts);
+                sortPosts();
+                listView.setAdapter(postAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<List<Post>> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 }

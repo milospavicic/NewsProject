@@ -20,10 +20,10 @@ import java.util.List;
  */
 
 public class PostAdapter extends ArrayAdapter<Post> {
-    ArrayList<Post> mPosts = new ArrayList<>();
+    List<Post> mPosts = new ArrayList<>();
     Context mContext = null;
 
-    public PostAdapter(Context context, ArrayList<Post> posts){
+    public PostAdapter(Context context, List<Post> posts){
         super(context,0,posts);
     }
 
@@ -37,13 +37,17 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
         TextView date_view = view.findViewById(R.id.post_date);
         TextView title_view = view.findViewById(R.id.post_title);
+        TextView likes_view = view.findViewById(R.id.post_likes);
+        TextView dislikes_view = view.findViewById(R.id.post_dislikes);
 
         String newDate = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(post.getDate());
 
         date_view.setText(newDate);
         title_view.setText(post.getTitle());
-
-
+        String likes = "Likes: "+post.getLikes();
+        String dislikes = "Dislikes: "+post.getDislikes();
+        likes_view.setText(likes);
+        dislikes_view.setText(dislikes);
         return view;
     }
 

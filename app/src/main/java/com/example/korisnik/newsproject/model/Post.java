@@ -3,6 +3,9 @@ package com.example.korisnik.newsproject.model;
 import android.graphics.Bitmap;
 import android.location.Location;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +14,8 @@ public class Post {
     private String title;
     private String description;
     private Bitmap photo;
+    @SerializedName("user")
+    @Expose
     private User author;
     private Date date;
     private int likes;

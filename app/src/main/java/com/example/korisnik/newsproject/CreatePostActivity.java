@@ -1,26 +1,46 @@
 package com.example.korisnik.newsproject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
 import com.example.korisnik.newsproject.model.NavItem;
+import com.example.korisnik.newsproject.model.Post;
+import com.example.korisnik.newsproject.model.Tag;
+import com.example.korisnik.newsproject.model.User;
+import com.example.korisnik.newsproject.service.PostService;
+import com.example.korisnik.newsproject.service.ServiceUtils;
+import com.example.korisnik.newsproject.service.TagService;
+import com.example.korisnik.newsproject.service.UserService;
+import com.example.korisnik.newsproject.tools.Util;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CreatePostActivity extends AppCompatActivity {
+    private SharedPreferences sharedPreferences;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -28,11 +48,39 @@ public class CreatePostActivity extends AppCompatActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
-
+    private Button uploadPost;
+    private User currentUser;
+    private UserService userService;
+    private PostService postService;
+    private TagService tagService;
+    private Post postResponse;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
+        uploadPost = findViewById(R.id.upload_post);
+        sharedPreferences = getSharedPreferences(LoginActivity.MY_PREFS_NAME, Context.MODE_PRIVATE);
+        String userName = sharedPreferences.getString(LoginActivity.USERNAME,"");
+        Log.e("Current User Name: ",userName);
+
+        postService = ServiceUtils.postService;
+        tagService  = ServiceUtils.tagService;
+        userService = ServiceUtils.userService;
+        Call<User> call = userService.getUserByUsername(userName);
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                currentUser = response.body();
+                if(currentUser!=null)
+                    Log.e("Current Username:",currentUser.getName());
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+
+            }
+        });
 
         prepareMenu(mNavItems);
 
@@ -136,5 +184,82 @@ public class CreatePostActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.activity_itemdetail, menu);
         return true;
+    }
+    public void uploadPost(View view){
+        EditText titleET = findViewById(R.id.titleET);
+        EditText descET = findViewById(R.id.descriptionET);
+        String title = titleET.getText().toString();
+        String desc = descET.getText().toString();
+        final Post post = new Post();
+        post.setTitle(title);
+        post.setDescription(desc);
+        post.setAuthor(currentUser);
+        post.setLikes(0);
+        post.setDislikes(0);
+        post.setDate(Calendar.getInstance().getTime());
+        Call<Post> call = postService.createPost(post);
+        call.enqueue(new Callback<Post>() {
+            @Override
+            public void onResponse(Call<Post> call, Response<Post> response) {
+                postResponse =  response.body();
+                Log.e("NewPostId",postResponse.getId()+"");
+                Toast.makeText(CreatePostActivity.this, "Post created.", Toast.LENGTH_LONG).show();
+                makeTags();
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<Post> call, Throwable t) {
+
+            }
+        });
+
+
+    }
+    public void makeTags(){
+        EditText tagsET = findViewById(R.id.tagsET);
+        String tagsNotFormatted = tagsET.getText().toString().trim();
+        String[] tags = tagsNotFormatted.split("#");
+        Log.e("tags: ",tags.toString());
+        if(tags.length!=0 && tags!=null){
+        for (String tag:tags) {
+            Log.e("Tag text",tag);
+            if (!tag.equals("")) {
+                Tag newTag = new Tag();
+                newTag.setName(tag);
+
+                Call<Tag> callTag = tagService.addTag(newTag);
+                callTag.enqueue(new Callback<Tag>() {
+                    @Override
+                    public void onResponse(Call<Tag> call, Response<Tag> response) {
+                        Tag tagResponse = response.body();
+                        Log.e("Tag created", tagResponse.getId() + "  postId " + postResponse.getId());
+                        linkTagToPost(postResponse.getId(), tagResponse.getId());
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<Tag> call, Throwable t) {
+
+                    }
+                });
+            }
+            }
+        }
+    }
+    public void linkTagToPost(int postId, int tagId){
+        Call<Post> call = postService.linkTagToPost(postId,tagId);
+
+        call.enqueue(new Callback<Post>() {
+            @Override
+            public void onResponse(Call<Post> call, Response<Post> response) {
+                Log.e("Tag linked ","successfully!!!");
+            }
+
+            @Override
+            public void onFailure(Call<Post> call, Throwable t) {
+
+            }
+        });
     }
 }

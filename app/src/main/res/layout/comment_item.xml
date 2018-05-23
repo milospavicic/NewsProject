@@ -60,5 +60,31 @@
         android:layout_below="@+id/comment_text"
         android:layout_toEndOf="@id/comment_like_button"
         android:text="Dislike"/>
+    <TextView
+        android:id="@+id/comment_likes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment_text"
+        android:layout_toEndOf="@+id/comment_dislike_button"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="7dp"
+        android:text="Likes: 14124"/>
+    <TextView
+        android:id="@+id/comment_dislikes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment_text"
+        android:layout_marginTop="15dp"
+        android:layout_toEndOf="@+id/comment_likes"
+        android:text="Disikes: 14124"/>
+    <ImageView
+        android:id="@+id/delete_comment"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_delete_black_24dp"/>
 
 </RelativeLayout>

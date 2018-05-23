@@ -1,11 +1,16 @@
 package com.example.korisnik.newsproject.model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 public class Comment {
     private int id;
     private String title;
     private String description;
+    @SerializedName("user")
+    @Expose
     private User author;
     private Date date;
     private Post post;

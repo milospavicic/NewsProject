@@ -75,6 +75,14 @@
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/create_photo"
                     android:text="Upload"/>
+                <Button
+                    android:id="@+id/upload_post"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    android:onClick="uploadPost"
+                    android:text="Upload post"/>
             </RelativeLayout>
 
         </LinearLayout>

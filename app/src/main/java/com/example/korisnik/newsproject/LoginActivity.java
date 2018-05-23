@@ -10,23 +10,31 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.korisnik.newsproject.database.UserDAO;
 import com.example.korisnik.newsproject.model.User;
+import com.example.korisnik.newsproject.service.ServiceUtils;
+import com.example.korisnik.newsproject.service.UserService;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
     public static final String MY_PREFS_NAME = "MyPreferences";
+    public static final String USERNAME = "userNameKey";
     EditText usernameET, passwordET;
     Button loginButton;
-    ArrayList<User> users ;
+    private UserService userService;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        users = UserDAO.getAllUsers(this);
+        userService = ServiceUtils.userService;
+
+
         loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,23 +43,55 @@ public class LoginActivity extends AppCompatActivity {
                 passwordET = findViewById(R.id.passwordText);
                 String username = usernameET.getText().toString();
                 String password = passwordET.getText().toString();
+                doLogin(username,password);
+//                usernameET = findViewById(R.id.usernameText);
+//                passwordET = findViewById(R.id.passwordText);
+//                String username = usernameET.getText().toString();
+//                String password = passwordET.getText().toString();
+//
+//                for (User user :users) {
+//                    if(username.equals(user.getUsername()) && password.equals(user.getPassword())){
+//                        //SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+//                        //editor.putInt("userId", user.getId());
+//                        //Log.e("USER_ID",""+user.getId());
+//                        //editor.apply();
+//                        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+//                        SharedPreferences.Editor editor = pref.edit();
+//                        editor.putInt("userId", user.getId());
+//                        editor.apply();
+//                        loginSucces();
+//                        return;
+//                    }
+//                }
+//
+//                Toast.makeText(LoginActivity.this,"Login failed.",Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
-                for (User user :users) {
-                    if(username.equals(user.getUsername()) && password.equals(user.getPassword())){
-                        //SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-                        //editor.putInt("userId", user.getId());
-                        //Log.e("USER_ID",""+user.getId());
-                        //editor.apply();
-                        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putInt("userId", user.getId());
-                        editor.apply();
+    public void doLogin(final String username, final String password) {
+        userService = ServiceUtils.userService;
+        Call<User> call = userService.login(username, password);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User user = response.body();
+                if(user!=null){
+                    if (username.equals(user.getUsername()) && password.equals(user.getPassword())) {
+                        SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+                        editor.putString("userNameKey", user.getUsername());
+                        editor.commit();
                         loginSucces();
-                        return;
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Login failed.", Toast.LENGTH_LONG).show();
                     }
+                }else {
+                    Toast.makeText(LoginActivity.this, "Login failed.", Toast.LENGTH_LONG).show();
                 }
+            }
 
-                Toast.makeText(LoginActivity.this,"Login failed.",Toast.LENGTH_LONG).show();
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
 
             }
         });
