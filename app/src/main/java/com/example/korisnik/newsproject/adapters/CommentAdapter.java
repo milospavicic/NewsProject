@@ -35,10 +35,11 @@ import retrofit2.Response;
 public class CommentAdapter extends ArrayAdapter<Comment> {
     private CommentService commentService;
     private SharedPreferences sharedPreferences;
-
+    private String userName;
     public CommentAdapter(Context context, List<Comment> mComments){
         super(context,0,mComments);
         sharedPreferences = context.getSharedPreferences(LoginActivity.MY_PREFS_NAME, Context.MODE_PRIVATE);
+        userName = sharedPreferences.getString(LoginActivity.USERNAME, "");
     }
 
     @Override
@@ -72,7 +73,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             likeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String userName = sharedPreferences.getString(LoginActivity.USERNAME, "");
+
                     if (!userName.equalsIgnoreCase(comment.getAuthor().getUsername())) {
                         Button dis = currentView.findViewById(R.id.comment_dislike_button);
                         if (dis.isEnabled()) {
@@ -108,7 +109,6 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
             disBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String userName = sharedPreferences.getString(LoginActivity.USERNAME, "");
                     if (!userName.equalsIgnoreCase(comment.getAuthor().getUsername())) {
                         Button like = currentView.findViewById(R.id.comment_like_button);
                         if (like.isEnabled()) {
@@ -141,7 +141,6 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         deleteComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String userName = sharedPreferences.getString(LoginActivity.USERNAME,"");
                 if(userName.equalsIgnoreCase(comment.getAuthor().getUsername())){
                     Call<Comment> call = commentService.deleteComment(comment.getId());
                     call.enqueue(new Callback<Comment>() {

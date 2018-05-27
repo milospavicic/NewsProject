@@ -56,10 +56,6 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
         mContext = this;
-//        mDatabaseHelper = new DatabaseHelper(this);
-//        mDatabaseHelper.dropTables();
-//        Util.initDB(this);
-//        posts = PostDAO.getPostsFromDB(this);
 
         prepareMenu(mNavItems);
 
@@ -211,6 +207,7 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.e("onResume","Done");
         loadPosts();
 
         if(postAdapter!=null)
@@ -248,7 +245,6 @@ public class PostActivity extends AppCompatActivity {
 
         postAdapter.notifyDataSetChanged();
     }
-
     public void sortByPopularity(){
 
         Collections.sort(posts, new Comparator<Post>() {
@@ -272,6 +268,9 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
                 posts = response.body();
+                for (Post post:posts) {
+                    Log.e("Post",post.getTitle());
+                }
                 postAdapter = new PostAdapter(mContext,posts);
                 sortPosts();
                 listView.setAdapter(postAdapter);

@@ -88,15 +88,14 @@ public class ReadPostActivity extends AppCompatActivity {
             jsonMyObject = extras.getString("Post");
         }
         currentPost = new Gson().fromJson(jsonMyObject, Post.class);
+
         loadPage();
         loadTags();
         loadComments();
 
-
         prepareMenu(mNavItems);
 
         mTitle = mDrawerTitle = getTitle();
-
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerList = findViewById(R.id.nav_list);
 
@@ -197,23 +196,6 @@ public class ReadPostActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.activity_itemdetail, menu);
         return true;
     }
-//    public void loadComments1(){
-//        Calendar currentTime = Calendar.getInstance();
-//        currentTime.set(Calendar.YEAR,2018);
-//        currentTime.set(Calendar.MONTH,1);
-//        currentTime.set(Calendar.DAY_OF_MONTH,5);
-//        currentTime.set(Calendar.HOUR_OF_DAY, 1);
-//        currentTime.set(Calendar.MINUTE, 0);
-//        currentTime.set(Calendar.SECOND, 0);
-//        currentTime.set(Calendar.MILLISECOND, 0);
-//
-//
-//        User tempUser = new User(1,"name",null,"username","password",new ArrayList<Post>(),new ArrayList<Comment>());
-//        Post tempPost = new Post(1,"title","desc",null,tempUser,null,null,null,null,1,1);
-//        mComments.add(new Comment(1,"title1","text1",tempUser,currentTime.getTime(),tempPost,1,1));
-//        mComments.add(new Comment(1,"title2","text2",tempUser,currentTime.getTime(),tempPost,1,1));
-//        mComments.add(new Comment(1,"title3","text3",tempUser,currentTime.getTime(),tempPost,1,1));
-//    }
 
     private void loadPage( ) {
         TextView title = findViewById(R.id.read_post_title);
@@ -261,7 +243,6 @@ public class ReadPostActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
                 comments = response.body();
-                Log.e("CommentCount",comments.size()+"");
                 mCommentAdapter = new CommentAdapter(mContext,comments);
                 sortComments();
                 mCommentList = findViewById(R.id.comment_list);
@@ -467,6 +448,8 @@ public class ReadPostActivity extends AppCompatActivity {
     }
     public void doDelete(){
         Toast.makeText(ReadPostActivity.this, "Post deleted.", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this,PostActivity.class);
+        startActivity(intent);
         finish();
     }
 

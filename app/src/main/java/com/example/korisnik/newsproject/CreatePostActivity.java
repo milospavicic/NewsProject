@@ -1,11 +1,20 @@
 package com.example.korisnik.newsproject;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.design.widget.Snackbar;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -18,9 +27,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.korisnik.newsproject.adapters.DrawerListAdapter;
+import com.example.korisnik.newsproject.dialogs.LocationDialog;
 import com.example.korisnik.newsproject.model.NavItem;
 import com.example.korisnik.newsproject.model.Post;
 import com.example.korisnik.newsproject.model.Tag;
@@ -30,16 +41,20 @@ import com.example.korisnik.newsproject.service.ServiceUtils;
 import com.example.korisnik.newsproject.service.TagService;
 import com.example.korisnik.newsproject.service.UserService;
 import com.example.korisnik.newsproject.tools.Util;
+import com.google.android.gms.location.LocationListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreatePostActivity extends AppCompatActivity {
+public class CreatePostActivity extends AppCompatActivity implements LocationListener {
     private SharedPreferences sharedPreferences;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -54,6 +69,16 @@ public class CreatePostActivity extends AppCompatActivity {
     private PostService postService;
     private TagService tagService;
     private Post postResponse;
+
+    private double longitude;
+    private double latitude;
+
+    private LocationManager locationManager;
+    private AlertDialog dialog;
+    private String provider;
+    private Location location;
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +170,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -261,5 +287,143 @@ public class CreatePostActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        longitude = location.getLongitude();
+        latitude = location.getLatitude();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Button location_btn = findViewById(R.id.get_location_btn);
+        location_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getProvider();
+
+                if (location == null) {
+                    Toast.makeText(getApplicationContext(), "Location not found", Toast.LENGTH_SHORT).show();
+                }
+                if (location != null) {
+                    System.out.println("LONGITUDEEE: " + location.getLongitude() + "LATITUDEEEE:" + location.getLatitude());
+                    getAddress(location.getLatitude(), location.getLongitude());
+                    onLocationChanged(location);
+                }
+            }
+        });
+    }
+
+    public void getProvider(){
+        Criteria criteria = new Criteria();
+
+        provider = locationManager.getBestProvider(criteria, true);
+
+        boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean wifi = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if(!gps &&  wifi){
+            showLocatonDialog();
+        }else{
+            if(checkLocationPermission()){
+                if(ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+
+                    locationManager.requestLocationUpdates(provider,0,0,this);
+
+                }else if(ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
+
+                    locationManager.requestLocationUpdates(provider,0,0,this);
+                }
+            }
+        }
+
+        location = null;
+
+        if(checkLocationPermission()){
+            if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                location = locationManager.getLastKnownLocation(provider);
+            }else if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                location = locationManager.getLastKnownLocation(provider);
+            }
+        }
+    }
+
+    private void showLocatonDialog() {
+        if (dialog == null) {
+            dialog = new LocationDialog(this).prepareDialog();
+        } else {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+
+        dialog.show();
+    }
+
+
+    public boolean checkLocationPermission(){
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,android.Manifest.permission.ACCESS_FINE_LOCATION)){
+                new AlertDialog.Builder(this)
+                        .setTitle("Allow user location")
+                        .setMessage("To continue working we need your locations... Allow now?")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ActivityCompat.requestPermissions(CreatePostActivity.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
+                            }
+                        })
+                        .create()
+                        .show();
+            }else{
+                ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public void getAddress(double latitude,double longitude){
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            String city = addresses.get(0).getLocality();
+            String country = addresses.get(0).getCountryName();
+            TextView location_text = findViewById(R.id.get_location_tv);
+
+            location_text.setText(city + "," + country);
+
+
+            System.out.println(city);
+            System.out.println(country);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
