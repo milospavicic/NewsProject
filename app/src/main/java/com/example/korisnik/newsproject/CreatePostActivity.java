@@ -70,6 +70,7 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
     private TagService tagService;
     private Post postResponse;
 
+
     private double longitude;
     private double latitude;
 
