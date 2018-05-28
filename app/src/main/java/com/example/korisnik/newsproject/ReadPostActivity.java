@@ -3,6 +3,8 @@ package com.example.korisnik.newsproject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -37,12 +39,14 @@ import com.example.korisnik.newsproject.service.TagService;
 import com.example.korisnik.newsproject.service.UserService;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -202,16 +206,16 @@ public class ReadPostActivity extends AppCompatActivity {
         TextView desc = findViewById(R.id.read_post_text);
         TextView author = findViewById(R.id.read_post_author);
         TextView datePosted = findViewById(R.id.read_post_date);
-        TextView likes = findViewById(R.id.read_post_tags);
         String newDate = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(currentPost.getDate());
-
-
         title.setText(currentPost.getTitle());
         desc.setText(currentPost.getDescription());
         author.setText("Author: "+currentPost.getAuthor().getName());
         datePosted.setText("Posted: "+newDate);
+
+        getLocation(currentPost.getLatitude(),currentPost.getLongitude());
         updateLikeDislike();
     }
+
     private void loadTags(){
 
         TextView tags_view = findViewById(R.id.read_post_tags);
@@ -484,5 +488,24 @@ public class ReadPostActivity extends AppCompatActivity {
         comments.remove(comment);
         mCommentAdapter = new CommentAdapter(mContext,comments);
         mCommentList.setAdapter(mCommentAdapter);
+    }
+    private void getLocation(double latitude, double longitude) {
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            String city = addresses.get(0).getLocality();
+            String country = addresses.get(0).getCountryName();
+            TextView location_text = findViewById(R.id.read_post_location);
+
+            location_text.setText("Location: "+city + ", " + country);
+
+            Log.e("city",city);
+            Log.e("country",country);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -94,6 +94,11 @@
                     android:layout_height="wrap_content"
                     android:text="Author"/>
                 <TextView
+                    android:id="@+id/read_post_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Location"/>
+                <TextView
                     android:id="@+id/read_post_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

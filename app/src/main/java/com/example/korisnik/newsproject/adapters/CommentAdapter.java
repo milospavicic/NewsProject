@@ -67,6 +67,9 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         likes.setText("Likes: "+comment.getLikes());
         dislikes.setText("Dislikes: "+comment.getDislikes());
 
+        ImageView userImg = view.findViewById(R.id.comment_user_picture);
+        userImg.setImageDrawable(view.getResources().getDrawable(R.drawable.ic_person_black_24dp));
+
         commentService = ServiceUtils.commentService;
         Button likeBtn =view.findViewById(R.id.comment_like_button);
         if(likeBtn!=null)

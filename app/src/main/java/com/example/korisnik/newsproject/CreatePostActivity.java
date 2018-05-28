@@ -1,23 +1,17 @@
 package com.example.korisnik.newsproject;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,14 +21,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.support.v7.widget.Toolbar;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -51,20 +43,12 @@ import com.example.korisnik.newsproject.service.ServiceUtils;
 import com.example.korisnik.newsproject.service.TagService;
 import com.example.korisnik.newsproject.service.UserService;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -229,8 +213,12 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
     public void uploadPost(View view){
         EditText titleET = findViewById(R.id.titleET);
         EditText descET = findViewById(R.id.descriptionET);
-        String title = titleET.getText().toString();
-        String desc = descET.getText().toString();
+        String title = titleET.getText().toString().trim();
+        String desc = descET.getText().toString().trim();
+        if(title.equalsIgnoreCase("") || desc.equalsIgnoreCase("")){
+            Toast.makeText(CreatePostActivity.this, "Fill all fields.", Toast.LENGTH_LONG).show();
+            return;
+        }
         final Post post = new Post();
         post.setTitle(title);
         post.setDescription(desc);
@@ -245,7 +233,7 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
             @Override
             public void onResponse(Call<Post> call, Response<Post> response) {
                 postResponse =  response.body();
-                Log.e("NewPostId",postResponse.getId()+"");
+                Log.e("NewPostLongAndLat",postResponse.getLongitude()+"  -  "+postResponse.getLatitude());
                 Toast.makeText(CreatePostActivity.this, "Post created.", Toast.LENGTH_LONG).show();
                 makeTags();
                 finish();
@@ -309,9 +297,9 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.e("Location","onLocationChanged");
         longitude = location.getLongitude();
         latitude = location.getLatitude();
+        Log.e("lat",latitude+" lon "+longitude+"");
     }
 
     @Override
@@ -332,7 +320,6 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(this);
     }
 
     @Override
@@ -357,10 +344,11 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
                     Toast.makeText(getApplicationContext(), "Location not found", Toast.LENGTH_SHORT).show();
                 }
                 if (location != null) {
-                    Log.e("EEEEEEEEEEEEj","LONGITUDEEE: " + location.getLongitude() + "LATITUDEEEE:" + location.getLatitude());
-                    System.out.println("LONGITUDEEE: " + location.getLongitude() + "LATITUDEEEE:" + location.getLatitude());
                     getAddress(location.getLatitude(), location.getLongitude());
                     onLocationChanged(location);
+                    Button btnSub = findViewById(R.id.upload_post);
+                    btnSub.setEnabled(true);
+                    locationManager.removeUpdates(CreatePostActivity.this);
                 }
             }
         });
@@ -368,12 +356,10 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
 
     public void getProvider(){
         Criteria criteria = new Criteria();
-
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if(locationManager!=null)
             provider = locationManager.getBestProvider(criteria, true);
 
-        Log.e("provider",provider+"");
         boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean wifi = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         Log.e("gps",gps+"");
@@ -387,12 +373,10 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
                     Log.e("option1","11111");
                     locationManager.requestLocationUpdates(provider,
                             0,0,this);
-                    Log.e("option1provider",provider+"  "+locationManager);
                 }else if(ContextCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
                     Log.e("option2","22222");
                     locationManager.requestLocationUpdates(provider,0,0,this);
-                    Log.e("option2provider",provider+"  "+locationManager);
                 }
             }
         }
@@ -401,11 +385,9 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
 
         if(checkLocationPermission()){
             if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                Log.e("option3","33333");
                 location = locationManager.getLastKnownLocation(provider);
                 Log.e("location333",location+"");
             }else if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                Log.e("option4","44444");
                 location = locationManager.getLastKnownLocation(provider);
                 Log.e("location444",location+"");
             }
@@ -444,10 +426,8 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
             }else{
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
             }
-            Log.e("return","false");
             return false;
         }else{
-            Log.e("return","true");
             return true;
         }
     }
@@ -457,19 +437,16 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
         List<Address> addresses;
         geocoder = new Geocoder(this, Locale.getDefault());
 
-
-
         try {
             addresses = geocoder.getFromLocation(latitude, longitude, 1);
             String city = addresses.get(0).getLocality();
             String country = addresses.get(0).getCountryName();
             TextView location_text = findViewById(R.id.get_location_tv);
 
-            location_text.setText(city + "," + country);
+            location_text.setText(city + ", " + country);
 
-
-            System.out.println(city);
-            System.out.println(country);
+            Log.e("city",city);
+            Log.e("country",country);
         } catch (IOException e) {
             e.printStackTrace();
         }
