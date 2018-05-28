@@ -1,30 +1,40 @@
 package com.example.korisnik.newsproject;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.support.v7.widget.Toolbar;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,12 +50,17 @@ import com.example.korisnik.newsproject.service.PostService;
 import com.example.korisnik.newsproject.service.ServiceUtils;
 import com.example.korisnik.newsproject.service.TagService;
 import com.example.korisnik.newsproject.service.UserService;
-import com.example.korisnik.newsproject.tools.Util;
-import com.google.android.gms.location.LocationListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -88,7 +103,6 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
         sharedPreferences = getSharedPreferences(LoginActivity.MY_PREFS_NAME, Context.MODE_PRIVATE);
         String userName = sharedPreferences.getString(LoginActivity.USERNAME,"");
         Log.e("Current User Name: ",userName);
-
         postService = ServiceUtils.postService;
         tagService  = ServiceUtils.tagService;
         userService = ServiceUtils.userService;
@@ -223,6 +237,8 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
         post.setAuthor(currentUser);
         post.setLikes(0);
         post.setDislikes(0);
+        post.setLongitude(longitude);
+        post.setLatitude(latitude);
         post.setDate(Calendar.getInstance().getTime());
         Call<Post> call = postService.createPost(post);
         call.enqueue(new Callback<Post>() {
@@ -293,13 +309,30 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.e("Location","onLocationChanged");
         longitude = location.getLongitude();
         latitude = location.getLatitude();
     }
 
     @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        locationManager.removeUpdates(this);
     }
 
     @Override
@@ -324,6 +357,7 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
                     Toast.makeText(getApplicationContext(), "Location not found", Toast.LENGTH_SHORT).show();
                 }
                 if (location != null) {
+                    Log.e("EEEEEEEEEEEEj","LONGITUDEEE: " + location.getLongitude() + "LATITUDEEEE:" + location.getLatitude());
                     System.out.println("LONGITUDEEE: " + location.getLongitude() + "LATITUDEEEE:" + location.getLatitude());
                     getAddress(location.getLatitude(), location.getLongitude());
                     onLocationChanged(location);
@@ -335,24 +369,30 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
     public void getProvider(){
         Criteria criteria = new Criteria();
 
-        provider = locationManager.getBestProvider(criteria, true);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(locationManager!=null)
+            provider = locationManager.getBestProvider(criteria, true);
 
+        Log.e("provider",provider+"");
         boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean wifi = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if(!gps &&  wifi){
+        Log.e("gps",gps+"");
+        Log.e("wifi",wifi+"");
+        if(!gps &&  !wifi){
             showLocatonDialog();
         }else{
             if(checkLocationPermission()){
                 if(ContextCompat.checkSelfPermission(this,
                         android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-
-                    locationManager.requestLocationUpdates(provider,0,0,this);
-
+                    Log.e("option1","11111");
+                    locationManager.requestLocationUpdates(provider,
+                            0,0,this);
+                    Log.e("option1provider",provider+"  "+locationManager);
                 }else if(ContextCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
-
+                        Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
+                    Log.e("option2","22222");
                     locationManager.requestLocationUpdates(provider,0,0,this);
+                    Log.e("option2provider",provider+"  "+locationManager);
                 }
             }
         }
@@ -361,11 +401,16 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
 
         if(checkLocationPermission()){
             if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                Log.e("option3","33333");
                 location = locationManager.getLastKnownLocation(provider);
+                Log.e("location333",location+"");
             }else if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                Log.e("option4","44444");
                 location = locationManager.getLastKnownLocation(provider);
+                Log.e("location444",location+"");
             }
         }
+        Log.e("Gotov","getProvider()");
     }
 
     private void showLocatonDialog() {
@@ -382,24 +427,27 @@ public class CreatePostActivity extends AppCompatActivity implements LocationLis
 
 
     public boolean checkLocationPermission(){
-        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,android.Manifest.permission.ACCESS_FINE_LOCATION)){
+        Log.e("check","LocationPermission");
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
                 new AlertDialog.Builder(this)
                         .setTitle("Allow user location")
                         .setMessage("To continue working we need your locations... Allow now?")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                ActivityCompat.requestPermissions(CreatePostActivity.this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
+                                ActivityCompat.requestPermissions(CreatePostActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
                             }
                         })
                         .create()
                         .show();
             }else{
-                ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
             }
+            Log.e("return","false");
             return false;
         }else{
+            Log.e("return","true");
             return true;
         }
     }

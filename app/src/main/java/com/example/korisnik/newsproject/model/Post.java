@@ -20,26 +20,12 @@ public class Post {
     private Date date;
     private int likes;
     private int dislikes;
-    private Location location;
+    private double latitude;
+    private double longitude;
     private List<Tag> tags;
     private List<Comment> comments;
 
     public Post() {
-    }
-
-    public Post(int id, String title, String description, Bitmap photo, User author, Date date,
-                Location location, List<Tag> tags, List<Comment> comments, int likes, int dislikes) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.photo = photo;
-        this.author = author;
-        this.date = date;
-        this.location = location;
-        this.tags = tags;
-        this.comments = comments;
-        this.likes = likes;
-        this.dislikes = dislikes;
     }
 
     public int getId() {
@@ -90,30 +76,6 @@ public class Post {
         this.date = date;
     }
 
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     public int getLikes() {
         return likes;
     }
@@ -130,12 +92,35 @@ public class Post {
         this.dislikes = dislikes;
     }
 
-    @Override
-    public String toString() {
-        return "Post: {" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }
