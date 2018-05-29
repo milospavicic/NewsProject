@@ -3,6 +3,8 @@ package com.example.korisnik.newsproject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.preference.PreferenceManager;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -211,6 +214,10 @@ public class ReadPostActivity extends AppCompatActivity {
         desc.setText(currentPost.getDescription());
         author.setText("Author: "+currentPost.getAuthor().getName());
         datePosted.setText("Posted: "+newDate);
+
+        Bitmap newBitMap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.news_image);
+        ImageView mainImage = findViewById(R.id.read_post_picture);
+        mainImage.setImageBitmap(newBitMap);
 
         getLocation(currentPost.getLatitude(),currentPost.getLongitude());
         updateLikeDislike();

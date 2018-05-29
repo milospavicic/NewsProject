@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class ServiceUtils {
-    public static final String SERVICE_API_PATH = "http://0d592268.ngrok.io/api/";
+    public static final String SERVICE_API_PATH = "http://313255e8.ngrok.io/api/";
     public static final String POSTS = "posts";
     public static final String POST = "posts/{id}";
     public static final String LOGIN = "users/{username}/{password}";

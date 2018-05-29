@@ -52,9 +52,6 @@ public class PostAdapter extends ArrayAdapter<Post> {
         String dislikes = "Dislikes: "+post.getDislikes();
         likes_view.setText(likes);
         dislikes_view.setText(dislikes);
-        Bitmap newBitMap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.news_image);
-        ImageView mainImage = view.findViewById(R.id.read_post_picture);
-        mainImage.setImageBitmap(newBitMap);
 
         return view;
     }
